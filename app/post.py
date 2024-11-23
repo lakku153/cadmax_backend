@@ -2,8 +2,8 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 import app
-from app.Basemodels import GIS, JDA, Architecture, AreaConversion, EngineeringDrawing, ItemInDB, Print, SectorSuperImpose, SitePlan, SurveyForm, UrbanPlanning, str_id
-from app.database import users_collection,form_collection
+from app.Basemodels import GIS, JDA, Architecture, AreaConversion, EngineeringDrawing, ItemInDB, Print, SectorSuperImpose, SitePlan, SurveyForm, UrbanPlanning, customer, customer1, str_id
+from app.database import users_collection,form_collection,customer_collection
 from app.authorization import get_current_user
 
 router = APIRouter()
@@ -33,44 +33,57 @@ async def create_survey_form(item: SurveyForm,current_user: str = Depends(get_cu
 # Architecture Form Endpoint
 @router.post("/Architecture/", response_model=ItemInDB)
 async def create_architecture(item: Architecture, current_user: str = Depends(get_current_user)):
-    return await create_item(item, "Architecture")
+    return await create_item(item, "Architecture",current_user)
 
 # Urban Planning Form Endpoint
 @router.post("/UrbanPlanning/", response_model=ItemInDB)
 async def create_urban_planning(item: UrbanPlanning, current_user: str = Depends(get_current_user)):
-    return await create_item(item, "UrbanPlanning")
+    return await create_item(item, "UrbanPlanning",current_user)
 
 # Engineering Drawing Form Endpoint
 @router.post("/EngineeringDrawing/", response_model=ItemInDB)
 async def create_engineering_drawing(item: EngineeringDrawing, current_user: str = Depends(get_current_user)):
-    return await create_item(item, "EngineeringDrawing")
+    return await create_item(item, "EngineeringDrawing",current_user)
 
 # JDA Form Endpoint
 @router.post("/JDA/", response_model=ItemInDB)
 async def create_jda(item: JDA, current_user: str = Depends(get_current_user)):
-    return await create_item(item, "JDA")
+    return await create_item(item, "JDA",current_user)
 
 # GIS Form Endpoint
 @router.post("/GIS/", response_model=ItemInDB)
 async def create_gis(item: GIS, current_user: str = Depends(get_current_user)):
-    return await create_item(item, "GIS")
+    return await create_item(item, "GIS",current_user)
 
 # Site Plan Form Endpoint
 @router.post("/SitePlan/", response_model=ItemInDB)
 async def create_site_plan(item: SitePlan, current_user: str = Depends(get_current_user)):
-    return await create_item(item, "SitePlan")
+    return await create_item(item, "SitePlan",current_user)
 
 # Area Conversion Form Endpoint
 @router.post("/AreaConversion/", response_model=ItemInDB)
 async def create_area_conversion(item: AreaConversion, current_user: str = Depends(get_current_user)):
-    return await create_item(item, "AreaConversion")
+    return await create_item(item, "AreaConversion",current_user)
 
 # Sector Super Imposition Form Endpoint
 @router.post("/SectorSuperImpose/", response_model=ItemInDB)
 async def create_sector_super_impose(item: SectorSuperImpose, current_user: str = Depends(get_current_user)):
-    return await create_item(item, "SectorSuperImpose")
+    return await create_item(item, "SectorSuperImpose",current_user)
 
 # Print Form Endpoint
 @router.post("/Print/", response_model=ItemInDB)
 async def create_print(item: Print, current_user: str = Depends(get_current_user)):
-    return await create_item(item, "Print")
+    return await create_item(item, "Print",current_user)
+
+
+@router.post("/customer_register/", response_model=customer1)
+async def register(user: customer):
+    # Check if the user already exists
+    existing_user = await customer_collection.find_one({"name": user.name})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Already registered")
+
+    result = await customer_collection.insert_one(user.dict())
+    created_user = await customer_collection.find_one({"_id": result.inserted_id})
+
+    return customer1(name=created_user["name"],company=created_user["company"],contact=created_user["contact"])

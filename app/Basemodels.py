@@ -9,21 +9,27 @@ class User(BaseModel):
 
 class UserInDB(User):
     hashed_password: str
-
+class profile(BaseModel):
+    username:str
+    Jobrole:str
 
 class User1(BaseModel):
     username: str
     password: str
-
+class CustomerName(BaseModel):
+    name: str
+    class Config:
+        orm_mode = True
 class customer(BaseModel):
-    ClientName:str
-    Company:str
-    Contect:int
-    Address:str
+    name:str
+    company:str
+    contact:str
+    address:str
+
 class customer1(BaseModel):
-    ClientName:str
-    Company:str
-    Contect:int
+    name:str
+    company:str
+    contact:str
 
 class Token(BaseModel):
     access_token: str

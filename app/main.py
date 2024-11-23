@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from app.Basemodels import User, Token, User1, customer, customer1
+from app.Basemodels import User, Token, User1, customer, customer1, profile
 from app.functions import get_user_by_username
 from app.security import create_access_token, verify_password,hash_password
 from app.database import users_collection,customer_collection
@@ -62,7 +62,8 @@ async def register(user: customer):
     result = await customer_collection.insert_one(user.dict())
     created_user = await customer_collection.find_one({"_id": result.inserted_id})
 
-    return customer1(ClientName=created_user["ClientName"],Company=created_user["Company"],Contect=created_user["Contect"])
+    return customer1(ClientName=created_user["ClientName"],Company=created_user["Company"],Contect=created_user["Contact"])
+
 
 
 
